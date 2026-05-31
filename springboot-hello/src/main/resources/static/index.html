@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Checker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f4fd;
+            border-radius: 4px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Stock Checker</h1>
+        
+        <form id="stockForm">
+            <div class="form-group">
+                <label for="stockNumber">Stock Number:</label>
+                <input type="text" id="stockNumber" name="stockNumber" placeholder="Enter stock number (e.g. AAPL)" required>
+            </div>
+            
+            <button type="submit">Enquire</button>
+        </form>
+        
+        <div id="result" class="result">
+            <!-- Result will be displayed here via JS -->
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('stockForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const stockNumber = document.getElementById('stockNumber').value.trim();
+            const resultDiv = document.getElementById('result');
+            
+            if (stockNumber) {
+                resultDiv.innerHTML = 'Loading...';
+                resultDiv.style.display = 'block';
+                
+                fetch(`/api/stock/${encodeURIComponent(stockNumber)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            resultDiv.innerHTML = `
+                                <strong>Symbol: ${data.symbol}</strong><br>
+                                <em>${data.error}</em>
+                            `;
+                        } else {
+                            resultDiv.innerHTML = `
+                                <strong>Symbol: ${data.symbol}</strong><br>
+                                Name: ${data.name || 'N/A'}<br>
+                                Price: ${data.price || 'N/A'}<br>
+                                Change: ${data.change || 'N/A'}%
+                            `;
+                        }
+                    })
+                    .catch(err => {
+                        resultDiv.innerHTML = `
+                            <strong>Error</strong><br>
+                            <em>Failed to fetch stock data</em>
+                        `;
+                        console.error(err);
+                    });
+            }
+        });
+    </script>
+</body>
+</html>
