@@ -12,7 +12,7 @@ public class HelloController {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    @GetMapping("/api/hello")
+    @GetMapping({"/", "/api/hello"})
     public String hello() {
         return "Hello World!!";
     }
